@@ -1,5 +1,6 @@
 package com.mvc.board.springmvcboard;
 
+import com.mvc.board.springmvcboard.dto.PostCreateDto;
 import com.mvc.board.springmvcboard.dto.PostResponseDto;
 import com.mvc.board.springmvcboard.entity.Post;
 import com.mvc.board.springmvcboard.repository.PostRepository;
@@ -16,6 +17,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -64,6 +67,73 @@ public class PostServiceTest {
             assertThat(secondPost.commentCount()).isZero();
 
             then(postRepository).should().findAll();
+        }
+    }
+
+    @Nested
+    @DisplayName("게시글 생성")
+    class CreatePost {
+        @Test
+        @DisplayName("정상적인 게시글 생성")
+        void createPostSuccess() {
+            // given
+            String title = "새 게시글";
+            String content = "새 내용";
+
+            PostCreateDto createDto = PostCreateDto.of(title, content);
+
+            Post realPost = new Post(title, content);
+            given(postRepository.save(any(Post.class))).willReturn(realPost);
+
+            // when
+            PostResponseDto result = postService.createPost(createDto);
+
+            // then
+            assertThat(result.title()).isEqualTo(title);
+            assertThat(result.content()).isEqualTo(content);
+            assertThat(result.viewCount()).isZero();
+            assertThat(result.commentCount()).isZero();
+
+            then(postRepository).should().save(any(Post.class));
+        }
+
+        @Test
+        @DisplayName("null DTO로 게시글 생성 시 예외 발생")
+        void createPostWithNullDtoThrowsException() {
+            // when, then
+            assertThatThrownBy(() -> postService.createPost(null))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            then(postRepository).shouldHaveNoInteractions();
+        }
+
+        @Test
+        @DisplayName("빈 제목으로 게시글 생성 시 예외 발생")
+        void createPostWithEmptyTitleThrowsException() {
+            // given
+            String content = "내용";
+
+            PostCreateDto emptyTitleDto = PostCreateDto.of("", content);
+
+            // when, then
+            assertThatThrownBy(() -> postService.createPost(emptyTitleDto))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            then(postRepository).shouldHaveNoInteractions();
+        }
+
+        @Test
+        @DisplayName("50자 초과 제목으로 게시글 생성 시 예외 발생")
+        void createPostWithTooLongTitleThrowsException() {
+            // given
+            String longTitle = "a".repeat(51);
+            PostCreateDto longTitleDto = PostCreateDto.of(longTitle, "내용");
+
+            // when, then
+            assertThatThrownBy(() -> postService.createPost(longTitleDto))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            then(postRepository).shouldHaveNoInteractions();
         }
     }
 }

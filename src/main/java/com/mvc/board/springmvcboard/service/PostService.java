@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface PostService {
     List<PostResponseDto> getAllPosts();
+
+    PostResponseDto createPost(PostCreateDto createDto);
 }
