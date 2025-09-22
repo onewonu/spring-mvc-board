@@ -1,6 +1,7 @@
 package com.mvc.board.springmvcboard;
 
 import com.mvc.board.springmvcboard.dto.PostCreateDto;
+import com.mvc.board.springmvcboard.dto.PostDetailDto;
 import com.mvc.board.springmvcboard.dto.PostResponseDto;
 import com.mvc.board.springmvcboard.entity.Post;
 import com.mvc.board.springmvcboard.repository.PostRepository;
@@ -15,12 +16,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -67,6 +70,20 @@ public class PostServiceTest {
             assertThat(secondPost.commentCount()).isZero();
 
             then(postRepository).should().findAll();
+        }
+
+        @Test
+        @DisplayName("빈 게시글 목록 조회")
+        void getAllPostsEmptyList() {
+            // given
+            given(postRepository.findAllWithComments()).willReturn(List.of());
+
+            // when
+            List<PostResponseDto> result = postService.getAllPosts();
+
+            // then
+            assertThat(result).isEmpty();
+            then(postRepository).should().findAllWithComments();
         }
     }
 
@@ -134,6 +151,67 @@ public class PostServiceTest {
                     .isInstanceOf(IllegalArgumentException.class);
 
             then(postRepository).shouldHaveNoInteractions();
+        }
+    }
+
+    @Nested
+    @DisplayName("게시글 상세 조회")
+    class GetPostDetail {
+
+        @Test
+        @DisplayName("성공 - 조회수 증가 확인")
+        void getPostDetailSuccessIncrementViewCount() {
+            // given
+            String title = "제목";
+            String content = "내용";
+
+            Post realPost = new Post(title, content);
+            given(postRepository.findById(1L)).willReturn(Optional.of(realPost));
+
+            // when
+            PostDetailDto result = postService.getPostDetail(1L);
+
+            // then
+            assertThat(result.title()).isEqualTo(title);
+            assertThat(result.content()).isEqualTo(content);
+            assertThat(result.viewCount()).isEqualTo(1);
+            assertThat(result.comments()).isEmpty();
+
+            assertThat(realPost.getViewCount()).isEqualTo(1);
+
+            then(postRepository).should().findById(1L);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 게시글 조회 시 예외 발생")
+        void getPostDetailNotFoundThrowsException() {
+            // given
+            given(postRepository.findById(999L)).willReturn(Optional.empty());
+
+            // when, then
+            assertThatThrownBy(() -> postService.getPostDetail(999L))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            then(postRepository).should().findById(999L);
+        }
+
+        @Test
+        @DisplayName("여러 번 조회 시 조회수 누적 증가")
+        void getPostDetailMultipleViewsIncrement() {
+            // given
+            Post realPost = new Post("제목", "내용");
+            given(postRepository.findById(1L)).willReturn(Optional.of(realPost));
+
+            // when
+            postService.getPostDetail(1L);
+            postService.getPostDetail(1L);
+            PostDetailDto result = postService.getPostDetail(1L);
+
+            // then
+            assertThat(result.viewCount()).isEqualTo(3);
+            assertThat(realPost.getViewCount()).isEqualTo(3);
+
+            then(postRepository).should(times(3)).findById(1L);
         }
     }
 }

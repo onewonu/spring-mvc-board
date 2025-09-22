@@ -1,6 +1,7 @@
 package com.mvc.board.springmvcboard.service;
 
 import com.mvc.board.springmvcboard.dto.PostCreateDto;
+import com.mvc.board.springmvcboard.dto.PostDetailDto;
 import com.mvc.board.springmvcboard.dto.PostResponseDto;
 import com.mvc.board.springmvcboard.entity.Post;
 import com.mvc.board.springmvcboard.repository.PostRepository;
@@ -38,5 +39,15 @@ public class PostServiceImpl implements PostService{
         Post savedPost = postRepository.save(post);
 
         return PostResponseDto.from(savedPost);
+    }
+
+    @Override
+    @Transactional
+    public PostDetailDto getPostDetail(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found with id: " + postId));
+
+        post.incrementViewCount();
+        return PostDetailDto.from(post);
     }
 }
