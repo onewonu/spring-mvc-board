@@ -68,7 +68,7 @@
                     </form>
                 </div>
 
-                <div>
+                <div th:id="'comment-buttons-' + ${comment.id}">
                     <button type="button" onclick="editComment(this)" th:data-comment-id="${comment.id}">수정</button>
                     <form th:action="@{/comments/{commentId}(commentId=${comment.id})}" method="post" style="display: inline; margin-left: 10px;"
                           onsubmit="return confirm('댓글을 삭제하시겠습니까?');">
@@ -96,14 +96,14 @@
                 const commentId = button.getAttribute('data-comment-id');
                 document.getElementById('comment-content-' + commentId).style.display = 'none';
                 document.getElementById('comment-edit-' + commentId).style.display = 'block';
-                button.style.display = 'none';
+                document.getElementById('comment-buttons-' + commentId).style.display = 'none'; // 버튼 영역 숨김
             }
 
             function cancelEditComment(button) {
                 const commentId = button.getAttribute('data-comment-id');
                 document.getElementById('comment-content-' + commentId).style.display = 'block';
                 document.getElementById('comment-edit-' + commentId).style.display = 'none';
-                document.querySelector('[data-comment-id="' + commentId + '"][onclick="editComment(this)"]').style.display = 'inline';
+                document.getElementById('comment-buttons-' + commentId).style.display = 'block'; // 버튼 영역 다시 표시
             }
         </script>
     </body>
