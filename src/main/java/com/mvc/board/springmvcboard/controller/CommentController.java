@@ -33,7 +33,7 @@ public class CommentController {
         return "redirect:/posts/" + postId;
     }
 
-    @PutMapping("/comments/{commentId}/edit")
+    @PutMapping("/comments/{commentId}")
     public String updateComment(
             @PathVariable Long commentId,
             @RequestParam Long postId,

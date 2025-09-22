@@ -49,7 +49,7 @@
 
                 <!-- 댓글 수정 폼 -->
                 <div th:id="'comment-edit-' + ${comment.id}" style="display: none;">
-                    <form th:action="@{/comments/{commentId}/edit(commentId=${comment.id})}" method="post">
+                    <form th:action="@{/comments/{commentId}(commentId=${comment.id})}" method="post">
                         <input type="hidden" name="_method" value="put">
                         <input type="hidden" name="postId" th:value="${post.id}">
                         <textarea name="content" rows="3" cols="50" th:text="${comment.content}" required></textarea>
