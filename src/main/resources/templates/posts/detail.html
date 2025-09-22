@@ -48,5 +48,16 @@
                 </div>
             </div>
         </div>
+
+        <!-- 댓글 작성 폼 -->
+        <h4>댓글 작성</h4>
+        <form th:action="@{/posts/{id}/comments(id=${post.id})}" method="post">
+            <div>
+                <textarea name="content" rows="3" cols="50" placeholder="댓글을 입력하세요" required></textarea>
+            </div>
+            <div>
+                <button type="submit">댓글 작성</button>
+            </div>
+        </form>
     </body>
 </html>
