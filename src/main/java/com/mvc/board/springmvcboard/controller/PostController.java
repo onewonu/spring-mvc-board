@@ -79,4 +79,16 @@ public class PostController {
             return REDIRECT_POSTS_URL + id + "/edit";
         }
     }
+
+    @DeleteMapping("/{id}")
+    public String deletePost(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            postService.deletePost(id);
+            redirectAttributes.addFlashAttribute("message", "게시글이 삭제되었습니다.");
+            return "redirect:/posts";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return REDIRECT_POSTS_URL + id;
+        }
+    }
 }

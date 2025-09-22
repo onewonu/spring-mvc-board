@@ -67,4 +67,14 @@ public class PostServiceImpl implements PostService{
 
         return PostResponseDto.from(post);
     }
+
+    @Override
+    @Transactional
+    public void deletePost(Long postId) {
+        if (!postRepository.existsById(postId)) {
+            throw new IllegalArgumentException("Post not found with id: " + postId);
+        }
+
+        postRepository.deleteById(postId);
+    }
 }

@@ -22,8 +22,10 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 
 
@@ -304,6 +306,39 @@ public class PostServiceTest {
 
             assertThat(realPost.getTitle()).isEqualTo("원래 제목");
             assertThat(realPost.getContent()).isEqualTo("원래 내용");
+        }
+    }
+
+    @Nested
+    @DisplayName("게시글 삭제")
+    class DeletePost {
+
+        @Test
+        @DisplayName("성공")
+        void deletePostSuccess() {
+            // given
+            given(postRepository.existsById(1L)).willReturn(true);
+
+            // when
+            postService.deletePost(1L);
+
+            // then
+            then(postRepository).should().existsById(1L);
+            then(postRepository).should().deleteById(1L);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 게시글 삭제 시 예외 발생")
+        void deletePostNotFoundThrowsException() {
+            // given
+            given(postRepository.existsById(999L)).willReturn(false);
+
+            // when, then
+            assertThatThrownBy(() -> postService.deletePost(999L))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            then(postRepository).should().existsById(999L);
+            then(postRepository).should(never()).deleteById(anyLong());
         }
     }
 }
