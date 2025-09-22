@@ -12,12 +12,16 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    private static final String REDIRECT_POSTS_URL = "redirect:/posts/";
-    private static final String REDIRECT_MESSAGE_ATTRIBUTE = "message";
-    private static final String REDIRECT_ERROR_MESSAGE_ATTRIBUTE = "error";
+    private static final String REDIRECT_POSTS_BASE = "redirect:/posts";
+    private static final String MESSAGE_ATTRIBUTE = "message";
+    private static final String ERROR_ATTRIBUTE = "error";
 
     public CommentController(CommentService commentService) {
         this.commentService = commentService;
+    }
+
+    private String redirectToPost(Long postId) {
+        return REDIRECT_POSTS_BASE + "/" + postId;
     }
 
     @PostMapping("/posts/{postId}/comments")
@@ -29,12 +33,12 @@ public class CommentController {
         try {
             CommentCreateDto createDto = CommentCreateDto.of(content);
             commentService.createComment(postId, createDto);
-            redirectAttributes.addFlashAttribute(REDIRECT_MESSAGE_ATTRIBUTE, "댓글이 작성되었습니다.");
+            redirectAttributes.addFlashAttribute(MESSAGE_ATTRIBUTE, "댓글이 작성되었습니다.");
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute(REDIRECT_ERROR_MESSAGE_ATTRIBUTE, e.getMessage());
+            redirectAttributes.addFlashAttribute(ERROR_ATTRIBUTE, e.getMessage());
         }
 
-        return REDIRECT_POSTS_URL + postId;
+        return redirectToPost(postId);
     }
 
     @PutMapping("/comments/{commentId}")
@@ -47,11 +51,12 @@ public class CommentController {
         try {
             CommentUpdateDto updateDto = CommentUpdateDto.of(content);
             commentService.updateComment(commentId, updateDto);
-            redirectAttributes.addFlashAttribute(REDIRECT_MESSAGE_ATTRIBUTE, "댓글이 수정되었습니다.");
+            redirectAttributes.addFlashAttribute(MESSAGE_ATTRIBUTE, "댓글이 수정되었습니다.");
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute(REDIRECT_ERROR_MESSAGE_ATTRIBUTE, e.getMessage());
+            redirectAttributes.addFlashAttribute(ERROR_ATTRIBUTE, e.getMessage());
         }
-        return REDIRECT_POSTS_URL + postId;
+
+        return redirectToPost(postId);
     }
 
     @DeleteMapping("/comments/{commentId}")
@@ -62,10 +67,11 @@ public class CommentController {
     ) {
         try {
             commentService.deleteComment(commentId);
-            redirectAttributes.addFlashAttribute(REDIRECT_MESSAGE_ATTRIBUTE, "댓글이 삭제되었습니다.");
+            redirectAttributes.addFlashAttribute(MESSAGE_ATTRIBUTE, "댓글이 삭제되었습니다.");
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute(REDIRECT_ERROR_MESSAGE_ATTRIBUTE, e.getMessage());
+            redirectAttributes.addFlashAttribute(ERROR_ATTRIBUTE, e.getMessage());
         }
-        return REDIRECT_POSTS_URL + postId;
+
+        return redirectToPost(postId);
     }
 }

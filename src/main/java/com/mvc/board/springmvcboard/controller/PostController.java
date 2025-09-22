@@ -18,10 +18,28 @@ public class PostController {
 
     private final PostService postService;
 
-    private static final String REDIRECT_POSTS_URL = "redirect:/posts/";
+    private static final String REDIRECT_POSTS_BASE = "redirect:/posts";
+    private static final String MESSAGE_ATTRIBUTE = "message";
+    private static final String ERROR_ATTRIBUTE = "error";
 
     public PostController(PostService postService) {
         this.postService = postService;
+    }
+
+    private String redirectToPostList() {
+        return REDIRECT_POSTS_BASE;
+    }
+
+    private String redirectToPost(Long postId) {
+        return REDIRECT_POSTS_BASE + "/" + postId;
+    }
+
+    private String redirectToPostCreate() {
+        return REDIRECT_POSTS_BASE + "/new";
+    }
+
+    private String redirectToPostEdit(Long postId) {
+        return REDIRECT_POSTS_BASE + "/" + postId + "/edit";
     }
 
     @GetMapping
@@ -41,12 +59,12 @@ public class PostController {
     public String createPost(@ModelAttribute PostCreateDto createDto, RedirectAttributes redirectAttributes) {
         try {
             PostResponseDto savedPost = postService.createPost(createDto);
-            redirectAttributes.addFlashAttribute("message", "게시글이 작성되었습니다.");
-            return REDIRECT_POSTS_URL + savedPost.id();
+            redirectAttributes.addFlashAttribute(MESSAGE_ATTRIBUTE, "게시글이 작성되었습니다.");
+            return redirectToPost(savedPost.id());
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute(ERROR_ATTRIBUTE, e.getMessage());
             redirectAttributes.addFlashAttribute("post", createDto);
-            return REDIRECT_POSTS_URL + "new";
+            return redirectToPostCreate();
         }
     }
 
@@ -72,11 +90,11 @@ public class PostController {
     ) {
         try {
             postService.updatePost(id, updateDto);
-            redirectAttributes.addFlashAttribute("message", "게시글이 수정되었습니다.");
-            return REDIRECT_POSTS_URL + id;
+            redirectAttributes.addFlashAttribute(MESSAGE_ATTRIBUTE, "게시글이 수정되었습니다.");
+            return redirectToPost(id);
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return REDIRECT_POSTS_URL + id + "/edit";
+            redirectAttributes.addFlashAttribute(ERROR_ATTRIBUTE, e.getMessage());
+            return redirectToPostEdit(id);
         }
     }
 
@@ -84,11 +102,11 @@ public class PostController {
     public String deletePost(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             postService.deletePost(id);
-            redirectAttributes.addFlashAttribute("message", "게시글이 삭제되었습니다.");
-            return "redirect:/posts";
+            redirectAttributes.addFlashAttribute(MESSAGE_ATTRIBUTE, "게시글이 삭제되었습니다.");
+            return redirectToPostList();
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return REDIRECT_POSTS_URL + id;
+            redirectAttributes.addFlashAttribute(ERROR_ATTRIBUTE, e.getMessage());
+            return redirectToPost(id);
         }
     }
 }
