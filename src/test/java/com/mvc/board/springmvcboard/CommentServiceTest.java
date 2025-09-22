@@ -21,8 +21,10 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CommentService 테스트")
@@ -236,4 +238,38 @@ class CommentServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("댓글 삭제")
+    class DeleteComment {
+
+        @Test
+        @DisplayName("성공")
+        void deleteCommentSuccess() {
+            // given
+            Long commentId = 1L;
+            given(commentRepository.existsById(commentId)).willReturn(true);
+
+            // when
+            commentService.deleteComment(commentId);
+
+            // then
+            then(commentRepository).should().existsById(commentId);
+            then(commentRepository).should().deleteById(commentId);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 댓글 삭제 시 예외 발생")
+        void deleteCommentNotFoundThrowsException() {
+            // given
+            Long nonExistentCommentId = 999L;
+            given(commentRepository.existsById(nonExistentCommentId)).willReturn(false);
+
+            // when, then
+            assertThatThrownBy(() -> commentService.deleteComment(nonExistentCommentId))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            then(commentRepository).should().existsById(nonExistentCommentId);
+            then(commentRepository).should(never()).deleteById(anyLong());
+        }
+    }
 }

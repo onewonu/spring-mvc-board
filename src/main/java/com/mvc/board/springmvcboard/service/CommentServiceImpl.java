@@ -51,4 +51,14 @@ public class CommentServiceImpl implements CommentService{
 
         return CommentResponseDto.from(comment);
     }
+
+    @Override
+    @Transactional
+    public void deleteComment(Long commentId) {
+        if (!commentRepository.existsById(commentId)) {
+            throw new IllegalArgumentException("Comment not found with id: " + commentId);
+        }
+
+        commentRepository.deleteById(commentId);
+    }
 }

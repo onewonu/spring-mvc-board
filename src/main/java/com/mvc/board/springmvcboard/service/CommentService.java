@@ -8,4 +8,6 @@ public interface CommentService {
     CommentResponseDto createComment(Long postId, CommentCreateDto createDto);
 
     CommentResponseDto updateComment(Long commentId, CommentUpdateDto updateDto);
+
+    void deleteComment(Long commentId);
 }
