@@ -18,6 +18,8 @@ public class PostController {
 
     private final PostService postService;
 
+    private static final String REDIRECT_POSTS_URL = "redirect:/posts/";
+
     public PostController(PostService postService) {
         this.postService = postService;
     }
@@ -40,11 +42,11 @@ public class PostController {
         try {
             PostResponseDto savedPost = postService.createPost(createDto);
             redirectAttributes.addFlashAttribute("message", "게시글이 작성되었습니다.");
-            return "redirect:/posts/" + savedPost.id();
+            return REDIRECT_POSTS_URL + savedPost.id();
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             redirectAttributes.addFlashAttribute("post", createDto);
-            return "redirect:/posts/new";
+            return REDIRECT_POSTS_URL + "new";
         }
     }
 
@@ -71,10 +73,10 @@ public class PostController {
         try {
             postService.updatePost(id, updateDto);
             redirectAttributes.addFlashAttribute("message", "게시글이 수정되었습니다.");
-            return "redirect:/posts/" + id;
+            return REDIRECT_POSTS_URL + id;
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/posts/" + id + "/edit";
+            return REDIRECT_POSTS_URL + id + "/edit";
         }
     }
 }
