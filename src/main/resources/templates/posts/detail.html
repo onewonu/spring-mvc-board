@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title th:text="${post.title}">게시글 제목</title>
+    </head>
+
+    <body>
+        <h1>게시글 상세</h1>
+
+        <!-- 메시지 표시 -->
+        <div th:if="${message}" style="color: green; margin-bottom: 10px;">
+            <p th:text="${message}">성공 메시지</p>
+        </div>
+        <div th:if="${error}" style="color: red; margin-bottom: 10px;">
+            <p th:text="${error}">에러 메시지</p>
+        </div>
+
+        <!-- 게시글 정보 -->
+        <div>
+            <h2 th:text="${post.title}">제목</h2>
+            <p>조회수: <span th:text="${post.viewCount}">0</span></p>
+            <hr>
+            <div th:text="${post.content}">내용</div>
+        </div>
+
+        <!-- 버튼 그룹 -->
+        <div>
+            <form action="/posts" method="get" style="display: inline;">
+                <button type="submit">목록으로</button>
+            </form>
+        </div>
+
+        <hr>
+
+        <!-- 댓글 목록 -->
+        <h3>댓글 (<span th:text="${#lists.size(post.comments)}">0</span>개)</h3>
+
+        <div th:if="${#lists.isEmpty(post.comments)}">
+            <p>작성된 댓글이 없습니다.</p>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(post.comments)}">
+            <div th:each="comment : ${post.comments}" style="border: 1px solid #ccc; margin: 10px 0; padding: 10px;">
+                <div th:id="'comment-content-' + ${comment.id}">
+                    <p th:text="${comment.content}">댓글 내용</p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

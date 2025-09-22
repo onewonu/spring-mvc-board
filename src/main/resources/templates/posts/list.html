@@ -36,7 +36,9 @@
                 <tbody>
                 <tr th:each="post, iterStat : ${posts}">
                     <td th:text="${iterStat.count}"></td>
-                    <td th:text="${post.title}"></td>
+                    <td>
+                        <a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}"></a>
+                    </td>
                     <td th:text="${post.viewCount}"></td>
                     <td th:text="${post.commentCount}"></td>
                 </tr>
