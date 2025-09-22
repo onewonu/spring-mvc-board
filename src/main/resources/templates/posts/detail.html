@@ -27,6 +27,9 @@
 
         <!-- 버튼 그룹 -->
         <div>
+            <form th:action="@{/posts/{id}/edit(id=${post.id})}" method="get" style="display: inline;">
+                <button type="submit">수정</button>
+            </form>
             <form action="/posts" method="get" style="display: inline;">
                 <button type="submit">목록으로</button>
             </form>

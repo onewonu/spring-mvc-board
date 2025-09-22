@@ -3,6 +3,7 @@ package com.mvc.board.springmvcboard.service;
 import com.mvc.board.springmvcboard.dto.PostCreateDto;
 import com.mvc.board.springmvcboard.dto.PostDetailDto;
 import com.mvc.board.springmvcboard.dto.PostResponseDto;
+import com.mvc.board.springmvcboard.dto.PostUpdateDto;
 import com.mvc.board.springmvcboard.entity.Post;
 import com.mvc.board.springmvcboard.repository.PostRepository;
 import org.springframework.stereotype.Service;
@@ -49,5 +50,21 @@ public class PostServiceImpl implements PostService{
 
         post.incrementViewCount();
         return PostDetailDto.from(post);
+    }
+
+    @Override
+    @Transactional
+    public PostResponseDto updatePost(Long postId, PostUpdateDto updateDto) {
+        if (updateDto == null) {
+            throw new IllegalArgumentException("PostUpdateDto cannot be null");
+        }
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found with id: " + postId));
+
+        post.updateTitle(updateDto.title());
+        post.updateContent(updateDto.content());
+
+        return PostResponseDto.from(post);
     }
 }

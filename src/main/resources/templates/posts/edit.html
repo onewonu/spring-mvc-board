@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>게시글 수정</title>
+    </head>
+
+    <body>
+        <h1>게시글 수정</h1>
+
+        <!-- 에러/성공 메시지 -->
+        <div th:if="${error}" style="color: red; margin-bottom: 10px;">
+            <p th:text="${error}">에러 메시지</p>
+        </div>
+
+        <!-- 수정 폼 -->
+        <form th:action="@{/posts/{id}(id=${post.id})}" method="post">
+            <input type="hidden" name="_method" value="patch">
+
+            <div style="margin-bottom: 10px;">
+                <label for="title">제목:</label><br>
+                <input type="text" id="title" name="title" th:value="${post.title}"
+                       maxlength="50" required style="width: 400px;">
+            </div>
+
+            <div style="margin-bottom: 10px;">
+                <label for="content">내용:</label><br>
+                <textarea id="content" name="content" rows="10" cols="50"
+                          th:text="${post.content}" style="width: 400px;"></textarea>
+            </div>
+
+            <!-- 버튼 그룹 -->
+            <div>
+                <button type="submit">수정 완료</button>
+                <form th:action="@{/posts/{id}(id=${post.id})}" method="post" style="display: inline;">
+                    <button type="submit">취소</button>
+                </form>
+            </div>
+        </form>
+
+        <!-- 현재 정보 표시 -->
+        <hr>
+        <h3>현재 정보</h3>
+        <p><strong>조회수:</strong> <span th:text="${post.viewCount}">0</span></p>
+        <p><strong>댓글 수:</strong> <span th:text="${#lists.size(post.comments)}">0</span>개</p>
+    </body>
+</html>

@@ -3,6 +3,7 @@ package com.mvc.board.springmvcboard;
 import com.mvc.board.springmvcboard.dto.PostCreateDto;
 import com.mvc.board.springmvcboard.dto.PostDetailDto;
 import com.mvc.board.springmvcboard.dto.PostResponseDto;
+import com.mvc.board.springmvcboard.dto.PostUpdateDto;
 import com.mvc.board.springmvcboard.entity.Post;
 import com.mvc.board.springmvcboard.repository.PostRepository;
 import com.mvc.board.springmvcboard.service.PostServiceImpl;
@@ -212,6 +213,97 @@ public class PostServiceTest {
             assertThat(realPost.getViewCount()).isEqualTo(3);
 
             then(postRepository).should(times(3)).findById(1L);
+        }
+    }
+
+    @Nested
+    @DisplayName("게시글 수정")
+    class UpdatePost {
+
+        @Test
+        @DisplayName("성공")
+        void updatePostSuccess() {
+            // given
+            Post realPost = new Post("원래 제목", "원래 내용");
+
+            String newTitle = "수정된 제목";
+            String newContent = "수정된 내용";
+
+            PostUpdateDto updateDto = PostUpdateDto.of(newTitle, newContent);
+
+            given(postRepository.findById(1L)).willReturn(Optional.of(realPost));
+
+            // when
+            PostResponseDto result = postService.updatePost(1L, updateDto);
+
+            // then
+            assertThat(realPost.getTitle()).isEqualTo(newTitle);
+            assertThat(realPost.getContent()).isEqualTo(newContent);
+
+            assertThat(result.title()).isEqualTo(newTitle);
+            assertThat(result.content()).isEqualTo(newContent);
+
+            then(postRepository).should().findById(1L);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 게시글 수정 시 예외 발생")
+        void updatePostNotFoundThrowsException() {
+            // given
+            given(postRepository.findById(999L)).willReturn(Optional.empty());
+            PostUpdateDto updateDto = PostUpdateDto.of("수정된 제목", "수정된 내용");
+
+            // when, then
+            assertThatThrownBy(() -> postService.updatePost(999L, updateDto))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            then(postRepository).should().findById(999L);
+        }
+
+        @Test
+        @DisplayName("null DTO로 게시글 수정 시 예외 발생")
+        void updatePostWithNullDtoThrowsException() {
+            // when, then
+            assertThatThrownBy(() -> postService.updatePost(1L, null))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            then(postRepository).shouldHaveNoInteractions();
+        }
+
+        @Test
+        @DisplayName("빈 제목으로 게시글 수정 시 예외 발생")
+        void updatePostWithEmptyTitleThrowsException() {
+            // given
+            Post realPost = new Post("원래 제목", "원래 내용");
+            PostUpdateDto emptyTitleDto = PostUpdateDto.of("", "수정된 내용");
+
+            given(postRepository.findById(1L)).willReturn(Optional.of(realPost));
+
+            // when, then
+            assertThatThrownBy(() -> postService.updatePost(1L, emptyTitleDto))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            assertThat(realPost.getTitle()).isEqualTo("원래 제목");
+            assertThat(realPost.getContent()).isEqualTo("원래 내용");
+        }
+
+        @Test
+        @DisplayName("50자 초과 제목으로 게시글 수정 시 예외 발생")
+        void updatePostWithTooLongTitleThrowsException() {
+            // given
+            Post realPost = new Post("원래 제목", "원래 내용");
+
+            String longTitle = "a".repeat(51);
+            PostUpdateDto longTitleDto = PostUpdateDto.of(longTitle, "수정된 내용");
+
+            given(postRepository.findById(1L)).willReturn(Optional.of(realPost));
+
+            // when, then
+            assertThatThrownBy(() -> postService.updatePost(1L, longTitleDto))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            assertThat(realPost.getTitle()).isEqualTo("원래 제목");
+            assertThat(realPost.getContent()).isEqualTo("원래 내용");
         }
     }
 }

@@ -3,6 +3,7 @@ package com.mvc.board.springmvcboard.controller;
 import com.mvc.board.springmvcboard.dto.PostCreateDto;
 import com.mvc.board.springmvcboard.dto.PostDetailDto;
 import com.mvc.board.springmvcboard.dto.PostResponseDto;
+import com.mvc.board.springmvcboard.dto.PostUpdateDto;
 import com.mvc.board.springmvcboard.service.PostService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -52,5 +53,28 @@ public class PostController {
         PostDetailDto post = postService.getPostDetail(id);
         model.addAttribute("post", post);
         return "posts/detail";
+    }
+
+    @GetMapping("/{id}/edit")
+    public String editPostForm(@PathVariable Long id, Model model) {
+        PostDetailDto post = postService.getPostDetail(id);
+        model.addAttribute("post", post);
+        return "posts/edit";
+    }
+
+    @PatchMapping("/{id}")
+    public String updatePost(
+            @PathVariable Long id,
+            @ModelAttribute PostUpdateDto updateDto,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            postService.updatePost(id, updateDto);
+            redirectAttributes.addFlashAttribute("message", "게시글이 수정되었습니다.");
+            return "redirect:/posts/" + id;
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/posts/" + id + "/edit";
+        }
     }
 }
