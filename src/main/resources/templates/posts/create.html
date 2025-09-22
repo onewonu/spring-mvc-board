@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>새 글 작성</title>
+    </head>
+
+    <body>
+        <h1>새 글 작성</h1>
+
+        <!-- 에러/성공 메시지 -->
+        <div th:if="${error}" style="color: red; margin-bottom: 10px;">
+            <p th:text="${error}">에러 메시지</p>
+        </div>
+
+        <!-- 작성 폼 -->
+        <form action="/posts" method="post">
+            <div style="margin-bottom: 10px;">
+                <label for="title">제목 *:</label><br>
+                <input type="text" id="title" name="title"
+                       th:value="${post != null ? post.title : ''}"
+                       maxlength="50" required style="width: 400px;"
+                       placeholder="제목을 입력하세요 (최대 50자)">
+            </div>
+
+            <div style="margin-bottom: 10px;">
+                <label for="content">내용:</label><br>
+                <textarea id="content" name="content" rows="10" cols="50"
+                          th:text="${post != null ? post.content : ''}"
+                          style="width: 400px;"
+                          placeholder="내용을 입력하세요"></textarea>
+            </div>
+
+            <div>
+                <button type="submit">작성 완료</button>
+            </div>
+        </form>
+
+        <!-- 취소 버튼 -->
+        <form action="/posts" method="get" style="display: inline; margin-top: 10px;">
+            <button type="submit">취소</button>
+        </form>
+
+        <!-- 작성 안내 -->
+        <hr>
+        <h3>작성 안내</h3>
+        <ul>
+            <li>제목은 필수 항목이며 최대 50자까지 입력 가능합니다.</li>
+            <li>내용은 선택 사항입니다.</li>
+            <li>작성 완료 후 게시글 상세 페이지로 이동합니다.</li>
+        </ul>
+    </body>
+</html>
