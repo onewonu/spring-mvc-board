@@ -46,6 +46,23 @@
                 <div th:id="'comment-content-' + ${comment.id}">
                     <p th:text="${comment.content}">댓글 내용</p>
                 </div>
+
+                <!-- 댓글 수정 폼 -->
+                <div th:id="'comment-edit-' + ${comment.id}" style="display: none;">
+                    <form th:action="@{/comments/{commentId}/edit(commentId=${comment.id})}" method="post">
+                        <input type="hidden" name="_method" value="put">
+                        <input type="hidden" name="postId" th:value="${post.id}">
+                        <textarea name="content" rows="3" cols="50" th:text="${comment.content}" required></textarea>
+                        <div style="margin-top: 5px;">
+                            <button type="submit">수정 완료</button>
+                            <button type="button" onclick="cancelEditComment(this)" th:data-comment-id="${comment.id}" style="margin-left: 10px;">취소</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div>
+                    <button type="button" onclick="editComment(this)" th:data-comment-id="${comment.id}">수정</button>
+                </div>
             </div>
         </div>
 
@@ -59,5 +76,21 @@
                 <button type="submit">댓글 작성</button>
             </div>
         </form>
+
+        <script>
+            function editComment(button) {
+                const commentId = button.getAttribute('data-comment-id');
+                document.getElementById('comment-content-' + commentId).style.display = 'none';
+                document.getElementById('comment-edit-' + commentId).style.display = 'block';
+                button.style.display = 'none';
+            }
+
+            function cancelEditComment(button) {
+                const commentId = button.getAttribute('data-comment-id');
+                document.getElementById('comment-content-' + commentId).style.display = 'block';
+                document.getElementById('comment-edit-' + commentId).style.display = 'none';
+                document.querySelector('[data-comment-id="' + commentId + '"][onclick="editComment(this)"]').style.display = 'inline';
+            }
+        </script>
     </body>
 </html>

@@ -2,6 +2,7 @@ package com.mvc.board.springmvcboard.service;
 
 import com.mvc.board.springmvcboard.dto.CommentCreateDto;
 import com.mvc.board.springmvcboard.dto.CommentResponseDto;
+import com.mvc.board.springmvcboard.dto.CommentUpdateDto;
 import com.mvc.board.springmvcboard.entity.Comment;
 import com.mvc.board.springmvcboard.entity.Post;
 import com.mvc.board.springmvcboard.repository.CommentRepository;
@@ -34,5 +35,20 @@ public class CommentServiceImpl implements CommentService{
         Comment savedComment = commentRepository.save(comment);
 
         return CommentResponseDto.from(savedComment);
+    }
+
+    @Override
+    @Transactional
+    public CommentResponseDto updateComment(Long commentId, CommentUpdateDto updateDto) {
+        if (updateDto == null) {
+            throw new IllegalArgumentException("CommentCreateDto cannot be null");
+        }
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("Comment not found with id: " + commentId));
+
+        comment.updateContent(updateDto.content());
+
+        return CommentResponseDto.from(comment);
     }
 }

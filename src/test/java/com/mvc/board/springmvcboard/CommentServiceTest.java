@@ -2,6 +2,7 @@ package com.mvc.board.springmvcboard;
 
 import com.mvc.board.springmvcboard.dto.CommentCreateDto;
 import com.mvc.board.springmvcboard.dto.CommentResponseDto;
+import com.mvc.board.springmvcboard.dto.CommentUpdateDto;
 import com.mvc.board.springmvcboard.entity.Comment;
 import com.mvc.board.springmvcboard.entity.Post;
 import com.mvc.board.springmvcboard.repository.CommentRepository;
@@ -129,6 +130,109 @@ class CommentServiceTest {
 
             then(postRepository).should().findById(nonExistentPostId);
             then(commentRepository).shouldHaveNoInteractions();
+        }
+    }
+
+    @Nested
+    @DisplayName("댓글 수정")
+    class UpdateComment {
+
+        @Test
+        @DisplayName("성공")
+        void updateCommentSuccess() {
+            // given
+            Long commentId = 1L;
+            String originalContent = "원래 댓글 내용";
+            String newContent = "수정된 댓글 내용";
+
+            Post realPost = new Post("게시글 제목", "게시글 내용");
+            Comment realComment = new Comment(originalContent, realPost);
+
+            CommentUpdateDto updateDto = CommentUpdateDto.of(newContent);
+
+            given(commentRepository.findById(commentId)).willReturn(Optional.of(realComment));
+
+            // when
+            CommentResponseDto result = commentService.updateComment(commentId, updateDto);
+
+            // then
+            assertThat(realComment.getContent()).isEqualTo(newContent);
+
+            assertThat(result.content()).isEqualTo(newContent);
+            assertThat(result.postId()).isEqualTo(realPost.getId());
+
+            then(commentRepository).should().findById(commentId);
+        }
+
+        @Test
+        @DisplayName("null DTO로 댓글 수정 시 예외 발생")
+        void updateCommentWithNullDtoThrowsException() {
+            // when, then
+            assertThatThrownBy(() -> commentService.updateComment(1L, null))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            then(commentRepository).shouldHaveNoInteractions();
+        }
+
+        @Test
+        @DisplayName("빈 내용으로 댓글 수정 시 예외 발생")
+        void updateCommentWithEmptyContentThrowsException() {
+            // given
+            Long commentId = 1L;
+            String originalContent = "원래 댓글 내용";
+
+            Post realPost = new Post("게시글 제목", "게시글 내용");
+            Comment realComment = new Comment(originalContent, realPost);
+            CommentUpdateDto emptyContentDto = CommentUpdateDto.of("");
+
+            given(commentRepository.findById(commentId)).willReturn(Optional.of(realComment));
+
+            // when, then
+            assertThatThrownBy(() -> commentService.updateComment(commentId, emptyContentDto))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            assertThat(realComment.getContent()).isEqualTo(originalContent);
+
+            then(commentRepository).should().findById(commentId);
+        }
+
+        @Test
+        @DisplayName("공백만 있는 내용으로 댓글 수정 시 예외 발생")
+        void updateCommentWithWhitespaceContentThrowsException() {
+            // given
+            Long commentId = 1L;
+            String originalContent = "원래 댓글 내용";
+
+            Post realPost = new Post("게시글 제목", "게시글 내용");
+            Comment realComment = new Comment(originalContent, realPost);
+            CommentUpdateDto whitespaceContentDto = CommentUpdateDto.of("   ");
+
+            given(commentRepository.findById(commentId)).willReturn(Optional.of(realComment));
+
+            // when, then
+            assertThatThrownBy(() -> commentService.updateComment(commentId, whitespaceContentDto))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            assertThat(realComment.getContent()).isEqualTo(originalContent);
+
+            then(commentRepository).should().findById(commentId);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 댓글 수정 시 예외 발생")
+        void updateCommentNotFoundThrowsException() {
+            // given
+            Long nonExistentCommentId = 999L;
+            CommentUpdateDto updateDto = CommentUpdateDto.of("수정된 댓글 내용");
+
+            given(commentRepository.findById(nonExistentCommentId)).willReturn(Optional.empty());
+
+            // when, then
+            assertThatThrownBy(() -> commentService.updateComment(nonExistentCommentId, updateDto))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("Comment not found with id: 999");
+
+            then(commentRepository).should().findById(nonExistentCommentId);
         }
     }
 
