@@ -21,7 +21,7 @@ public class PostServiceImpl implements PostService{
     @Override
     @Transactional(readOnly = true)
     public List<PostResponseDto> getAllPosts() {
-        List<Post> posts = postRepository.findAll();
+        List<Post> posts = postRepository.findAllWithComments();
         return posts.stream()
                 .map(PostResponseDto::fromSummary)
                 .toList();
