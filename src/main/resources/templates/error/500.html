@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 - 서버 오류</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+        .error-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 72px;
+            color: #e74c3c;
+            margin: 0;
+        }
+        h2 {
+            color: #333;
+        }
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 5px;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+<div class="error-container">
+    <h1>500</h1>
+    <h2>서버 오류가 발생했습니다</h2>
+
+    <div class="error-message">
+        <strong>오류:</strong> 일시적인 서버 오류가 발생했습니다.
+    </div>
+
+    <p>잠시 후 다시 시도해주세요.</p>
+    <p>문제가 계속되면 관리자에게 문의해주세요.</p>
+
+    <div>
+        <a href="javascript:history.back()" class="btn">이전 페이지</a>
+        <a href="/posts" class="btn">게시판 목록</a>
+    </div>
+</div>
+</body>
+</html>
