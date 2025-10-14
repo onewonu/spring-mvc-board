@@ -1,5 +1,6 @@
 package com.mvc.board.springmvcboard.entity;
 
+import com.mvc.board.springmvcboard.exception.InvalidInputException;
 import jakarta.persistence.*;
 
 @Entity
@@ -32,7 +33,7 @@ public class Comment {
 
     private void validateContent(String content) {
         if (content == null || content.trim().isEmpty()) {
-            throw new IllegalArgumentException("The content is required");
+            throw InvalidInputException.of("content", "required");
         }
     }
 

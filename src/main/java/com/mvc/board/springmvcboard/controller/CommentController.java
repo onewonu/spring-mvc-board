@@ -14,7 +14,6 @@ public class CommentController {
 
     private static final String REDIRECT_POSTS_BASE = "redirect:/posts";
     private static final String MESSAGE_ATTRIBUTE = "message";
-    private static final String ERROR_ATTRIBUTE = "error";
 
     public CommentController(CommentService commentService) {
         this.commentService = commentService;
@@ -30,14 +29,9 @@ public class CommentController {
             @RequestParam String content,
             RedirectAttributes redirectAttributes
     ) {
-        try {
-            CommentCreateDto createDto = CommentCreateDto.of(content);
-            commentService.createComment(postId, createDto);
-            redirectAttributes.addFlashAttribute(MESSAGE_ATTRIBUTE, "댓글이 작성되었습니다.");
-        } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute(ERROR_ATTRIBUTE, e.getMessage());
-        }
-
+        CommentCreateDto createDto = CommentCreateDto.of(content);
+        commentService.createComment(postId, createDto);
+        redirectAttributes.addFlashAttribute(MESSAGE_ATTRIBUTE, "댓글이 작성되었습니다.");
         return redirectToPost(postId);
     }
 
@@ -48,14 +42,9 @@ public class CommentController {
             @RequestParam String content,
             RedirectAttributes redirectAttributes
     ) {
-        try {
-            CommentUpdateDto updateDto = CommentUpdateDto.of(content);
-            commentService.updateComment(commentId, updateDto);
-            redirectAttributes.addFlashAttribute(MESSAGE_ATTRIBUTE, "댓글이 수정되었습니다.");
-        } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute(ERROR_ATTRIBUTE, e.getMessage());
-        }
-
+        CommentUpdateDto updateDto = CommentUpdateDto.of(content);
+        commentService.updateComment(commentId, updateDto);
+        redirectAttributes.addFlashAttribute(MESSAGE_ATTRIBUTE, "댓글이 수정되었습니다.");
         return redirectToPost(postId);
     }
 
@@ -65,13 +54,8 @@ public class CommentController {
             @RequestParam Long postId,
             RedirectAttributes redirectAttributes
     ) {
-        try {
-            commentService.deleteComment(commentId);
-            redirectAttributes.addFlashAttribute(MESSAGE_ATTRIBUTE, "댓글이 삭제되었습니다.");
-        } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute(ERROR_ATTRIBUTE, e.getMessage());
-        }
-
+        commentService.deleteComment(commentId);
+        redirectAttributes.addFlashAttribute(MESSAGE_ATTRIBUTE, "댓글이 삭제되었습니다.");
         return redirectToPost(postId);
     }
 }

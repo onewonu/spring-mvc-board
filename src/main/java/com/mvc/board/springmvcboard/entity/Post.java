@@ -1,5 +1,6 @@
 package com.mvc.board.springmvcboard.entity;
 
+import com.mvc.board.springmvcboard.exception.InvalidInputException;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,10 +48,10 @@ public class Post {
 
     private void validateTitle(String title) {
         if (title == null || title.trim().isEmpty()) {
-            throw new IllegalArgumentException("The title is required");
+            throw InvalidInputException.of("title", "required");
         }
         if (title.length() > 50) {
-            throw new IllegalArgumentException("The title cannot exceed 50 characters");
+            throw InvalidInputException.of("title", "cannot exceed 50 characters");
         }
     }
 
