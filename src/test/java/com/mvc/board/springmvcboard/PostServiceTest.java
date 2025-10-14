@@ -5,6 +5,8 @@ import com.mvc.board.springmvcboard.dto.PostDetailDto;
 import com.mvc.board.springmvcboard.dto.PostResponseDto;
 import com.mvc.board.springmvcboard.dto.PostUpdateDto;
 import com.mvc.board.springmvcboard.entity.Post;
+import com.mvc.board.springmvcboard.exception.EntityNotFoundException;
+import com.mvc.board.springmvcboard.exception.InvalidInputException;
 import com.mvc.board.springmvcboard.repository.PostRepository;
 import com.mvc.board.springmvcboard.service.PostServiceImpl;
 import org.junit.jupiter.api.DisplayName;
@@ -53,7 +55,7 @@ public class PostServiceTest {
             for (int i = 0; i < 10; i++) post1.incrementViewCount();
             for (int i = 0; i < 5; i++) post2.incrementViewCount();
 
-            given(postRepository.findAll()).willReturn(Arrays.asList(post1, post2));
+            given(postRepository.findAllWithComments()).willReturn(Arrays.asList(post1, post2));
 
             // when
             List<PostResponseDto> result = postService.getAllPosts();
@@ -72,7 +74,7 @@ public class PostServiceTest {
             assertThat(secondPost.viewCount()).isEqualTo(5);
             assertThat(secondPost.commentCount()).isZero();
 
-            then(postRepository).should().findAll();
+            then(postRepository).should().findAllWithComments();
         }
 
         @Test
@@ -122,7 +124,7 @@ public class PostServiceTest {
         void createPostWithNullDtoThrowsException() {
             // when, then
             assertThatThrownBy(() -> postService.createPost(null))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(InvalidInputException.class);
 
             then(postRepository).shouldHaveNoInteractions();
         }
@@ -137,7 +139,7 @@ public class PostServiceTest {
 
             // when, then
             assertThatThrownBy(() -> postService.createPost(emptyTitleDto))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(InvalidInputException.class);
 
             then(postRepository).shouldHaveNoInteractions();
         }
@@ -151,7 +153,7 @@ public class PostServiceTest {
 
             // when, then
             assertThatThrownBy(() -> postService.createPost(longTitleDto))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(InvalidInputException.class);
 
             then(postRepository).shouldHaveNoInteractions();
         }
@@ -193,7 +195,7 @@ public class PostServiceTest {
 
             // when, then
             assertThatThrownBy(() -> postService.getPostDetail(999L))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(EntityNotFoundException.class);
 
             then(postRepository).should().findById(999L);
         }
@@ -257,7 +259,7 @@ public class PostServiceTest {
 
             // when, then
             assertThatThrownBy(() -> postService.updatePost(999L, updateDto))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(EntityNotFoundException.class);
 
             then(postRepository).should().findById(999L);
         }
@@ -267,7 +269,7 @@ public class PostServiceTest {
         void updatePostWithNullDtoThrowsException() {
             // when, then
             assertThatThrownBy(() -> postService.updatePost(1L, null))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(InvalidInputException.class);
 
             then(postRepository).shouldHaveNoInteractions();
         }
@@ -283,7 +285,7 @@ public class PostServiceTest {
 
             // when, then
             assertThatThrownBy(() -> postService.updatePost(1L, emptyTitleDto))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(InvalidInputException.class);
 
             assertThat(realPost.getTitle()).isEqualTo("원래 제목");
             assertThat(realPost.getContent()).isEqualTo("원래 내용");
@@ -302,7 +304,7 @@ public class PostServiceTest {
 
             // when, then
             assertThatThrownBy(() -> postService.updatePost(1L, longTitleDto))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(InvalidInputException.class);
 
             assertThat(realPost.getTitle()).isEqualTo("원래 제목");
             assertThat(realPost.getContent()).isEqualTo("원래 내용");
@@ -335,7 +337,7 @@ public class PostServiceTest {
 
             // when, then
             assertThatThrownBy(() -> postService.deletePost(999L))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(EntityNotFoundException.class);
 
             then(postRepository).should().existsById(999L);
             then(postRepository).should(never()).deleteById(anyLong());
