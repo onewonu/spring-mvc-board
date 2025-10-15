@@ -26,10 +26,9 @@ public class CommentController {
     @PostMapping("/posts/{postId}/comments")
     public String createComment(
             @PathVariable Long postId,
-            @RequestParam String content,
+            @ModelAttribute CommentCreateDto createDto,
             RedirectAttributes redirectAttributes
     ) {
-        CommentCreateDto createDto = CommentCreateDto.of(content);
         commentService.createComment(postId, createDto);
         redirectAttributes.addFlashAttribute(MESSAGE_ATTRIBUTE, "댓글이 작성되었습니다.");
         return redirectToPost(postId);
@@ -39,10 +38,9 @@ public class CommentController {
     public String updateComment(
             @PathVariable Long commentId,
             @RequestParam Long postId,
-            @RequestParam String content,
+            @ModelAttribute CommentUpdateDto updateDto,
             RedirectAttributes redirectAttributes
     ) {
-        CommentUpdateDto updateDto = CommentUpdateDto.of(content);
         commentService.updateComment(commentId, updateDto);
         redirectAttributes.addFlashAttribute(MESSAGE_ATTRIBUTE, "댓글이 수정되었습니다.");
         return redirectToPost(postId);
