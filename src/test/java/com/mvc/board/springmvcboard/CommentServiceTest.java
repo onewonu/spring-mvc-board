@@ -5,6 +5,8 @@ import com.mvc.board.springmvcboard.dto.CommentResponseDto;
 import com.mvc.board.springmvcboard.dto.CommentUpdateDto;
 import com.mvc.board.springmvcboard.entity.Comment;
 import com.mvc.board.springmvcboard.entity.Post;
+import com.mvc.board.springmvcboard.exception.EntityNotFoundException;
+import com.mvc.board.springmvcboard.exception.InvalidInputException;
 import com.mvc.board.springmvcboard.repository.CommentRepository;
 import com.mvc.board.springmvcboard.repository.PostRepository;
 import com.mvc.board.springmvcboard.service.CommentServiceImpl;
@@ -73,7 +75,7 @@ class CommentServiceTest {
         void createCommentWithNullDtoThrowsException() {
             // when, then
             assertThatThrownBy(() -> commentService.createComment(1L, null))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(InvalidInputException.class);
 
             then(postRepository).shouldHaveNoInteractions();
             then(commentRepository).shouldHaveNoInteractions();
@@ -92,7 +94,7 @@ class CommentServiceTest {
 
             // when, then
             assertThatThrownBy(() -> commentService.createComment(postId, emptyContentDto))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(InvalidInputException.class);
 
             then(postRepository).should().findById(postId);
             then(commentRepository).shouldHaveNoInteractions();
@@ -111,7 +113,7 @@ class CommentServiceTest {
 
             // when, then
             assertThatThrownBy(() -> commentService.createComment(postId, whitespaceContentDto))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(InvalidInputException.class);
 
             then(postRepository).should().findById(postId);
             then(commentRepository).shouldHaveNoInteractions();
@@ -128,7 +130,7 @@ class CommentServiceTest {
 
             // when, then
             assertThatThrownBy(() -> commentService.createComment(nonExistentPostId, createDto))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(EntityNotFoundException.class);
 
             then(postRepository).should().findById(nonExistentPostId);
             then(commentRepository).shouldHaveNoInteractions();
@@ -171,7 +173,7 @@ class CommentServiceTest {
         void updateCommentWithNullDtoThrowsException() {
             // when, then
             assertThatThrownBy(() -> commentService.updateComment(1L, null))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(InvalidInputException.class);
 
             then(commentRepository).shouldHaveNoInteractions();
         }
@@ -191,7 +193,7 @@ class CommentServiceTest {
 
             // when, then
             assertThatThrownBy(() -> commentService.updateComment(commentId, emptyContentDto))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(InvalidInputException.class);
 
             assertThat(realComment.getContent()).isEqualTo(originalContent);
 
@@ -213,7 +215,7 @@ class CommentServiceTest {
 
             // when, then
             assertThatThrownBy(() -> commentService.updateComment(commentId, whitespaceContentDto))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(InvalidInputException.class);
 
             assertThat(realComment.getContent()).isEqualTo(originalContent);
 
@@ -231,8 +233,7 @@ class CommentServiceTest {
 
             // when, then
             assertThatThrownBy(() -> commentService.updateComment(nonExistentCommentId, updateDto))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("Comment not found with id: 999");
+                    .isInstanceOf(EntityNotFoundException.class);
 
             then(commentRepository).should().findById(nonExistentCommentId);
         }
@@ -266,7 +267,7 @@ class CommentServiceTest {
 
             // when, then
             assertThatThrownBy(() -> commentService.deleteComment(nonExistentCommentId))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(EntityNotFoundException.class);
 
             then(commentRepository).should().existsById(nonExistentCommentId);
             then(commentRepository).should(never()).deleteById(anyLong());

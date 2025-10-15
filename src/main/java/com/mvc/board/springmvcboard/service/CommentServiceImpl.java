@@ -5,13 +5,15 @@ import com.mvc.board.springmvcboard.dto.CommentResponseDto;
 import com.mvc.board.springmvcboard.dto.CommentUpdateDto;
 import com.mvc.board.springmvcboard.entity.Comment;
 import com.mvc.board.springmvcboard.entity.Post;
+import com.mvc.board.springmvcboard.exception.EntityNotFoundException;
+import com.mvc.board.springmvcboard.exception.InvalidInputException;
 import com.mvc.board.springmvcboard.repository.CommentRepository;
 import com.mvc.board.springmvcboard.repository.PostRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class CommentServiceImpl implements CommentService{
+public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
@@ -25,11 +27,11 @@ public class CommentServiceImpl implements CommentService{
     @Transactional
     public CommentResponseDto createComment(Long postId, CommentCreateDto createDto) {
         if (createDto == null) {
-            throw new IllegalArgumentException("CommentCreateDto cannot be null");
+            throw new InvalidInputException("CommentCreateDto cannot be null");
         }
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found with id: " + postId));
+                .orElseThrow(() -> EntityNotFoundException.of("Post", postId));
 
         Comment comment = new Comment(createDto.content(), post);
         Comment savedComment = commentRepository.save(comment);
@@ -41,11 +43,11 @@ public class CommentServiceImpl implements CommentService{
     @Transactional
     public CommentResponseDto updateComment(Long commentId, CommentUpdateDto updateDto) {
         if (updateDto == null) {
-            throw new IllegalArgumentException("CommentCreateDto cannot be null");
+            throw new InvalidInputException("CommentUpdateDto cannot be null");
         }
 
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("Comment not found with id: " + commentId));
+                .orElseThrow(() -> EntityNotFoundException.of("Comment", commentId));
 
         comment.updateContent(updateDto.content());
 
@@ -56,7 +58,7 @@ public class CommentServiceImpl implements CommentService{
     @Transactional
     public void deleteComment(Long commentId) {
         if (!commentRepository.existsById(commentId)) {
-            throw new IllegalArgumentException("Comment not found with id: " + commentId);
+            throw EntityNotFoundException.of("Comment", commentId);
         }
 
         commentRepository.deleteById(commentId);
