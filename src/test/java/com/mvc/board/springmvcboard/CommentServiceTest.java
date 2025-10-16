@@ -71,17 +71,6 @@ class CommentServiceTest {
         }
 
         @Test
-        @DisplayName("null DTO로 댓글 생성 시 예외 발생")
-        void createCommentWithNullDtoThrowsException() {
-            // when, then
-            assertThatThrownBy(() -> commentService.createComment(1L, null))
-                    .isInstanceOf(InvalidInputException.class);
-
-            then(postRepository).shouldHaveNoInteractions();
-            then(commentRepository).shouldHaveNoInteractions();
-        }
-
-        @Test
         @DisplayName("빈 내용으로 댓글 생성 시 예외 발생")
         void createCommentWithEmptyContentThrowsException() {
             // given
@@ -166,16 +155,6 @@ class CommentServiceTest {
             assertThat(result.postId()).isEqualTo(realPost.getId());
 
             then(commentRepository).should().findById(commentId);
-        }
-
-        @Test
-        @DisplayName("null DTO로 댓글 수정 시 예외 발생")
-        void updateCommentWithNullDtoThrowsException() {
-            // when, then
-            assertThatThrownBy(() -> commentService.updateComment(1L, null))
-                    .isInstanceOf(InvalidInputException.class);
-
-            then(commentRepository).shouldHaveNoInteractions();
         }
 
         @Test

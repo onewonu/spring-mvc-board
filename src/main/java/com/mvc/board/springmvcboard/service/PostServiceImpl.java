@@ -6,7 +6,6 @@ import com.mvc.board.springmvcboard.dto.PostResponseDto;
 import com.mvc.board.springmvcboard.dto.PostUpdateDto;
 import com.mvc.board.springmvcboard.entity.Post;
 import com.mvc.board.springmvcboard.exception.EntityNotFoundException;
-import com.mvc.board.springmvcboard.exception.InvalidInputException;
 import com.mvc.board.springmvcboard.repository.PostRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,10 +33,6 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public PostResponseDto createPost(PostCreateDto createDto) {
-        if (createDto == null) {
-            throw new InvalidInputException("PostCreateDto cannot be null");
-        }
-
         Post post = new Post(createDto.title(), createDto.content());
         Post savedPost = postRepository.save(post);
 
@@ -57,10 +52,6 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public PostResponseDto updatePost(Long postId, PostUpdateDto updateDto) {
-        if (updateDto == null) {
-            throw new InvalidInputException("PostUpdateDto cannot be null");
-        }
-
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> EntityNotFoundException.of("Post", postId));
 

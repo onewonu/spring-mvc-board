@@ -120,16 +120,6 @@ public class PostServiceTest {
         }
 
         @Test
-        @DisplayName("null DTO로 게시글 생성 시 예외 발생")
-        void createPostWithNullDtoThrowsException() {
-            // when, then
-            assertThatThrownBy(() -> postService.createPost(null))
-                    .isInstanceOf(InvalidInputException.class);
-
-            then(postRepository).shouldHaveNoInteractions();
-        }
-
-        @Test
         @DisplayName("빈 제목으로 게시글 생성 시 예외 발생")
         void createPostWithEmptyTitleThrowsException() {
             // given
@@ -262,16 +252,6 @@ public class PostServiceTest {
                     .isInstanceOf(EntityNotFoundException.class);
 
             then(postRepository).should().findById(999L);
-        }
-
-        @Test
-        @DisplayName("null DTO로 게시글 수정 시 예외 발생")
-        void updatePostWithNullDtoThrowsException() {
-            // when, then
-            assertThatThrownBy(() -> postService.updatePost(1L, null))
-                    .isInstanceOf(InvalidInputException.class);
-
-            then(postRepository).shouldHaveNoInteractions();
         }
 
         @Test
