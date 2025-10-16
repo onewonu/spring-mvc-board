@@ -6,7 +6,6 @@ import com.mvc.board.springmvcboard.dto.CommentUpdateDto;
 import com.mvc.board.springmvcboard.entity.Comment;
 import com.mvc.board.springmvcboard.entity.Post;
 import com.mvc.board.springmvcboard.exception.EntityNotFoundException;
-import com.mvc.board.springmvcboard.exception.InvalidInputException;
 import com.mvc.board.springmvcboard.repository.CommentRepository;
 import com.mvc.board.springmvcboard.repository.PostRepository;
 import org.springframework.stereotype.Service;
@@ -26,10 +25,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public CommentResponseDto createComment(Long postId, CommentCreateDto createDto) {
-        if (createDto == null) {
-            throw new InvalidInputException("CommentCreateDto cannot be null");
-        }
-
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> EntityNotFoundException.of("Post", postId));
 
@@ -42,10 +37,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public CommentResponseDto updateComment(Long commentId, CommentUpdateDto updateDto) {
-        if (updateDto == null) {
-            throw new InvalidInputException("CommentUpdateDto cannot be null");
-        }
-
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> EntityNotFoundException.of("Comment", commentId));
 
